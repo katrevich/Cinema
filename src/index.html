@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body ng-strict-di ng-cloak ng-controller="appController as app">
+
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="" ui-sref="root">Cinema</a>
+      </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav">
+          <li><a href="" ui-sref="suggestion" ui-sref-active="active">Add suggestion</a></li>
+          <li class="pull-right"><a href="" data-toggle="modal" data-target="#auth-popup">Login</a></li>
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div>
+  </nav>
+
+  <div class="container">
+    <ui-view></ui-view>
+  </div>
+
+<!-- Modal -->
+<div class="modal fade" id="auth-popup" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Login</h4>
+      </div>
+      <div class="modal-body">
+        <form action="#" ng-submit="app.login($event)" name="app.loginForm" novalidate>
+          <div class="form-group" ng-class="{'has-error': !app.loginForm.userName.$valid && !app.loginForm.userName.$pristine}">
+            <label>Email</label>
+            <input type="email" class="form-control" name="userName" ng-model="app.userName" required>
+            <small ng-show="app.loginForm.userName.$error.email && !app.loginForm.userName.$pristine">This should be email</small>
+          </div>
+          <div class="form-group" ng-class="{'has-error': !app.loginForm.userPassword.$valid && !app.loginForm.userPassword.$pristine}">
+            <label>Password</label>
+            <input type="password" class="form-control" name="userPassword" ng-model="app.userPassword" ng-minlength="6" required>
+            <small ng-show="app.loginForm.userPassword.$error.minlength && !app.loginForm.userName.$pristine">Password must be at least 6 characters long</small>
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary">Login</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  <script src="/static/bundle.js"></script>
+</body>
+</html>
