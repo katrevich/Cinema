@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const movieSchema = new mongoose.Schema({
-<<<<<<< HEAD
   adult: Boolean,
   backdrop_path: String,
   genre_ids: [String],
@@ -23,18 +22,9 @@ const movieSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  userid: Number,
   username: String,
   voters: [String]
-=======
-  title: String,
-  backdrop_path: String,
-  release_date: Date,
-  overview: String,
-  votes: {
-    type: Number,
-    default: 0
-  }
->>>>>>> origin/master
 });
 
 const Movie = mongoose.model('Movie', movieSchema);
