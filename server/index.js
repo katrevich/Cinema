@@ -25,8 +25,5 @@ app.use('/api', api);
 
 app.listen(port, function () {
   console.log('server started');
-<<<<<<< HEAD
-  console.log('http://localhost/'+port);
-=======
->>>>>>> origin/master
+  console.log('http://localhost/' + port);
 })
