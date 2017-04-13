@@ -1,0 +1,21 @@
+<h1>Votes</h1>
+
+<div ng-if="$ctrl.fetching" class="loader">
+  <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>
+</div>
+
+<div class="movies-list" ng-cloak>
+  <ul class="row">
+    <li ng-repeat="(i, movie) in $ctrl.movies" class="col-md-4 col-sm-6">
+      <div class="img-wrap"><img src="{{'https://image.tmdb.org/t/p/w500'+movie.backdrop_path}}" ng-if="movie.backdrop_path" class="md-card-image"></div>
+      <div class="title">{{movie.title}}</div>
+      <div class="date">{{movie.release_date}}</div>
+      <div class="description">{{movie.overview}}</div>
+      <div class="footer">
+        <span>{{movie.votes}}</span>
+        <md-button ng-click="$ctrl.vote(i)" class="btn btn-sm btn-default">Vote</md-button>
+        <md-button ng-click="$ctrl.deleteMovie(i)" class="btn btn-sm btn-default">Delete movie</md-button>
+      </div>
+    </li>
+  </ul>
+</div>
