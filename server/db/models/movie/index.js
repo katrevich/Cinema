@@ -24,7 +24,11 @@ const movieSchema = new mongoose.Schema({
   },
   userid: Number,
   username: String,
-  voters: [String]
+  voters: [String],
+  veto: {
+    type: Boolean,
+    default: false
+  }
 });
 
 const Movie = mongoose.model('Movie', movieSchema);

@@ -13,17 +13,21 @@ const controller = {
 
     movieModel.save((err) => {
       if(err){
-        res.send(err);
+        res.status(400).send({success: false, error: "Movie not added"});
         console.log(err);
       } else {
-        res.send({success: true})
+        res.send({success: true, message: 'Movie successfuly added!'});
       }
     });
   },
 
   voteForMovie: (req, res) => {
-    Movie.update({title: req.body.movie.title}, {$inc: {votes: 1}}, (err) => {
-      res.send(err);
+    Movie.update({title: req.body.movie.title}, {$addToSet: {"voters": req.body.username}}, (err) => {
+      if(err) {
+        res.status(400).send({success: false, error: "Movie not added"});
+      } else {
+        res.send({success: true, message: "Vote counted!"});
+      }
     })
   },
 
@@ -35,7 +39,37 @@ const controller = {
 
   removeMovie: (req, res) => {
     Movie.remove({title: req.body.movie.title}, (err) => {
-      res.send(err);
+      res.status(400).send({success: false, error: "Movie not removed"});
+    })
+  },
+
+  veto: (req, res) => {
+    User.findOne({username: req.body.username}, (err, user) => {
+      if(err) throw err;
+
+      if(user && !user.vetoed) {
+        Movie.findOne({title: req.body.movie.title}, (err, movie) => {
+          if(movie) {
+            movie.veto = true;
+            movie.save(err => {
+              if(err) {
+                res.status(400).send({success: false, error: "Movie not founed"});
+              } else {
+                user.vetoed = true;
+                user.save((err) => {
+                  if(err) {
+                    res.status(400).send({success: false, error: "User not founed"});
+                  } else {
+                    res.send({success: true, message: "Veto accepted!", user});
+                  }
+                })
+              }
+            })
+          }
+        })
+      } else {
+        res.status(403).send({success: false, error: "Only one veto per voting!"});
+      }
     })
   },
 
