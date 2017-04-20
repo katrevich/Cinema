@@ -14,5 +14,7 @@ router.patch('/movie', authRequired, api.veto);
 router.post('/register', api.register);
 router.post('/login', api.login);
 router.get('/users', authRequired, api.getUsers);
+router.put('/users', authRequired, api.removeUser);
+router.put('/user', authRequired, api.updateUser);
 
 module.exports = router;

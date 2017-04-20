@@ -74,13 +74,14 @@ const controller = {
   },
 
   register: (req, res) => {
-    User.findOne({ username: req.body.username }, (err, user) => {
+    let u = req.body.user;
+    User.findOne({ username: u.username }, (err, user) => {
       if(err) throw err;
 
       if(!user) {
-        encrypt.encrypt(req.body.password, hash => {
+        encrypt.encrypt(u.password, hash => {
           let user = new User({
-            username: req.body.username,
+            username: u.username,
             password: hash
           });
           user.save(err => {
@@ -88,12 +89,12 @@ const controller = {
               res.send(err);
               console.log(err);
             } else {
-              res.send({success: true})
+              res.send({success: true, message: "User succesfuly added"});
             }
           })
         })
       } else {
-        res.status(400).send({success: false, error: 'User already exists'});
+        res.status(400).send({success: false, error: `User: ${u.username} already exists`});
       }
     })
   },
@@ -128,6 +129,30 @@ const controller = {
   getUsers: (req, res) => {
     User.find({}, (err, users) => {
       res.send(users);
+    })
+  },
+
+  removeUser: (req, res) => {
+    let user = req.body.user;
+    if(user.username === 'admin') {
+      res.status(401).send({success: false, error: "User could not be removed!"})
+    } else {
+      User.remove({username: user.username}, (err) => {
+        if(!err){
+          res.status(200).send({success: true, message: "User succesfuly removed!"})
+        } else {
+          res.status(401).send({success: false, error: "User could not be removed!"})
+        }
+      })
+    }
+  },
+
+  updateUser: (req, res) => {
+    let user = req.body.user;
+    User.update({username: user.username}, {username: user.username, admin: user.admin}, (err) => {
+      if(err) {
+        res.status(401).send({success: false, error: "User could not be updated!"})
+      }
     })
   }
 }
