@@ -2,13 +2,14 @@ const mongoose = require('mongoose');
 const config = require('../db');
 const Movie = mongoose.model('Movie');
 const User = mongoose.model('User');
+const App = mongoose.model('App');
 const encrypt = require('../helpers/encrypt');
 const jwt = require('jsonwebtoken');
 
 const controller = {
   addMovie: (req, res) => {
     let movie = req.body.movie;
-    Object.assign(movie, {username: req.body.username});
+    Object.assign(movie, {username: req.body.username, voters: [req.body.username]});
     var movieModel = new Movie(movie);
 
     movieModel.save((err) => {
@@ -39,7 +40,11 @@ const controller = {
 
   removeMovie: (req, res) => {
     Movie.remove({title: req.body.movie.title}, (err) => {
-      res.status(400).send({success: false, error: "Movie not removed"});
+      if(err) {
+        res.status(400).send({success: false, error: "Movie not removed"});
+      } else {
+        res.status(200).send({success: true, message: "Movie succesfuly removed!"})
+      }
     })
   },
 
@@ -152,7 +157,44 @@ const controller = {
     User.update({username: user.username}, {username: user.username, admin: user.admin}, (err) => {
       if(err) {
         res.status(401).send({success: false, error: "User could not be updated!"})
+      } else {
+        res.status(200).send({success: true, message: "User succesfuly updated!"})
       }
+    })
+  },
+
+  restartVoting: (req, res) => {
+    Movie.remove({}, (err) => {
+      if(!err) {
+        App.remove({}, (err) => {
+          if(err) {
+            res.status(401).send({success: false, error: "Voting could not be restarted!"})
+          } else {
+            let app = new App();
+            app.save((err) => {
+              if(!err) {
+                res.status(200).send({success: true, message: "Voting succesfuly restarted!"})
+              }
+            });
+          }
+        })
+      } else {
+        res.status(401).send({success: false, error: "Movies could not been removed!"})
+      }
+    })
+  },
+
+  endVoting: (req, res) => {
+    App.update({}, {voting: false}, (err) => {
+      if(!err){
+        res.status(200).send({success: true, message: "Voting succesfuly ended!"})
+      }
+    })
+  },
+
+  getStatus: (req, res) => {
+    App.findOne({}, (err, app) => {
+      res.send({app});
     })
   }
 }
