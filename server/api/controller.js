@@ -111,22 +111,28 @@ const controller = {
       if(user) {
         encrypt.compare(req.body.password, user.password, valid => {
           if(valid) {
-            let token = jwt.sign(user, config.secret, {
+            let token = jwt.sign({username: user.username, password: user.password}, config.secret, {
               expiresIn : 60*60*24
             });
-            res.send({
-              success: true,
-              username: user.username,
-              vetoed: user.vetoed,
-              admin: user.admin,
-              token
+            user.token = token;
+            user.save((err, savedUser) => {
+              if(!err) {
+                res.send({
+                  success: true,
+                  username: savedUser.username,
+                  vetoed: savedUser.vetoed,
+                  admin: savedUser.admin,
+                  token: savedUser.token
+                })
+              }
             })
+            
           } else {
-            res.status(401).send({success: false, error: 'Wrong username or password'});
+            res.status(200).send({success: false, error: 'Wrong username or password'});
           }
         })
       } else {
-        res.status(401).send({success: false, error: 'Wrong username or password'});
+        res.status(200).send({success: false, error: 'Wrong username or password'});
       }
     })
   },
@@ -134,6 +140,16 @@ const controller = {
   getUsers: (req, res) => {
     User.find({}, (err, users) => {
       res.send(users);
+    })
+  },
+
+  getUser: (req, res) => {
+    User.findOne({token: req.get('Authorization')}, (err, user) => {
+      if(!err){
+        res.status(200).send(user);
+      } else {
+        res.status(400).send({success: false, error:"No such user"})
+      }
     })
   },
 
@@ -154,7 +170,7 @@ const controller = {
 
   updateUser: (req, res) => {
     let user = req.body.user;
-    User.update({username: user.username}, {username: user.username, admin: user.admin}, (err) => {
+    User.update({username: user.username}, {username: user.username}, (err) => {
       if(err) {
         res.status(401).send({success: false, error: "User could not be updated!"})
       } else {
@@ -173,7 +189,11 @@ const controller = {
             let app = new App();
             app.save((err) => {
               if(!err) {
-                res.status(200).send({success: true, message: "Voting succesfuly restarted!"})
+                User.update({}, {$set: { vetoed: false}}, {"multi": true}, (err) => {
+                  if(!err){
+                    res.status(200).send({success: true, message: "Voting succesfuly restarted!"})
+                  }
+                })
               }
             });
           }
